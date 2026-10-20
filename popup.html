@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>JJ的沉浸翻译</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea;
+    --accent: #4f6bff; --accent-fg: #fff; --field: #f5f5f7; --warn: #c2410c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1c1c1e; --fg: #f2f2f7; --muted: #a1a1a6; --line: #38383a; --field: #2c2c2e; --warn: #fb923c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 300px; background: var(--bg); color: var(--fg);
+         font: 13px/1.45 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 4px; }
+  header b { font-size: 14px; }
+  header a { color: var(--muted); text-decoration: none; font-size: 12px; cursor: pointer; }
+  main { padding: 8px 14px 14px; display: grid; gap: 10px; }
+  .primary { width: 100%; padding: 10px; border: 0; border-radius: 8px; background: var(--accent);
+             color: var(--accent-fg); font-size: 14px; font-weight: 600; cursor: pointer; }
+  .primary.on { background: var(--field); color: var(--fg); border: 1px solid var(--line); }
+  .primary:disabled { opacity: .5; cursor: not-allowed; }
+  .row { display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 8px; }
+  .row label { color: var(--muted); }
+  select { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px;
+           background: var(--field); color: var(--fg); font: inherit; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { border: 0; padding: 6px; background: var(--field); color: var(--fg); font: inherit; cursor: pointer; }
+  .seg button.sel { background: var(--accent); color: var(--accent-fg); }
+  .secondary { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px;
+               background: transparent; color: var(--fg); font: inherit; cursor: pointer; }
+  .hint { color: var(--muted); font-size: 12px; }
+  .warn { color: var(--warn); font-size: 12px; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 2px 0; }
+</style>
+</head>
+<body>
+<header><b>JJ的沉浸翻译</b><a id="openOptions">设置</a></header>
+<main>
+  <button id="toggle" class="primary">翻译此页</button>
+  <div id="pageHint" class="hint" hidden></div>
+  <div id="keyWarn" class="warn" hidden>当前模型配置没有填写 API Key，请先到设置页填写。</div>
+
+  <div class="row"><label>显示</label>
+    <div class="seg"><button data-mode="bilingual">双语对照</button><button data-mode="translation">仅译文</button></div>
+  </div>
+  <div class="row"><label for="targetLang">目标语言</label><select id="targetLang"></select></div>
+  <div class="row"><label for="theme">译文样式</label><select id="theme"></select></div>
+  <div class="row"><label for="profile">模型</label><select id="profile"></select></div>
+
+  <hr>
+  <button id="babeldoc" class="secondary">PDF 翻译（BabelDOC）</button>
+  <div id="pdfHint" class="hint" hidden>当前是 PDF：请下载后，在 BabelDOC 页面上传翻译。</div>
+  <div class="hint">快捷键：Alt+A 翻译页面，Alt+I 翻译输入框；在输入框末尾连按 3 次空格也会翻译。</div>
+</main>
+<script src="common.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

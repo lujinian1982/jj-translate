@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "JJ的沉浸翻译",
+  "description": "双语对照网页翻译、YouTube 字幕翻译、输入框翻译。模型 API 自定义（DeepSeek、智谱等 OpenAI 兼容接口）。",
+  "version": "0.1.0",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["common.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*"],
+      "js": ["yt_main.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*"],
+      "js": ["youtube.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "toggle-page": {
+      "suggested_key": { "default": "Alt+A" },
+      "description": "翻译当前页 / 显示原文"
+    },
+    "translate-input": {
+      "suggested_key": { "default": "Alt+I" },
+      "description": "翻译当前输入框"
+    }
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "JJ的沉浸翻译"
+  },
+  "options_page": "options.html"
+}

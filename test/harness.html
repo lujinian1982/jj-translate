@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JJ的沉浸翻译 DOM test</title>
+<link rel="stylesheet" href="../content.css">
+<style>
+  body { font: 16px/1.6 Georgia, serif; max-width: 720px; margin: 24px auto; padding: 0 16px; background: #fff; color: #222; }
+  #ctl { position: sticky; top: 0; background: #eef; padding: 8px; display: flex; flex-wrap: wrap; gap: 6px; z-index: 10; font: 13px sans-serif; }
+  nav a { margin-right: 12px; }
+</style>
+<script>
+  // Fake extension APIs: translation = "【译】" + source text.
+  const store = {};
+  const listeners = [];
+  window.__sent = [];
+  window.chrome = {
+    runtime: {
+      sendMessage: async (m) => {
+        window.__sent.push(m);
+        await new Promise((r) => setTimeout(r, 250));
+        if (m.texts.some((t) => t.includes('FAILME'))) return { ok: false, error: 'HTTP 401: invalid api key' };
+        return { ok: true, translations: m.texts.map((t) => '【译】' + t) };
+      },
+      onMessage: { addListener(fn) { window.__ltMsg = fn; } },
+    },
+    storage: {
+      local: {
+        get: async () => ({ ...store }),
+        set: async (o) => {
+          Object.assign(store, o);
+          const ch = Object.fromEntries(Object.keys(o).map((k) => [k, { newValue: o[k] }]));
+          listeners.forEach((l) => l(ch, 'local'));
+        },
+      },
+      onChanged: { addListener(fn) { listeners.push(fn); } },
+    },
+  };
+  window.msg = (m) => new Promise((r) => window.__ltMsg(m, {}, r));
+</script>
+</head>
+<body>
+<div id="ctl" translate="no">
+  <button onclick="msg({type:'toggle'}).then(r=>state.textContent=JSON.stringify(r))">toggle</button>
+  <button onclick="chrome.storage.local.set({mode:'translation'})">仅译文</button>
+  <button onclick="chrome.storage.local.set({mode:'bilingual'})">双语</button>
+  <button onclick="chrome.storage.local.set({theme:'highlight'})">highlight</button>
+  <button onclick="chrome.storage.local.set({theme:'blockquote'})">blockquote</button>
+  <button onclick="addDynamic()">动态添加段落</button>
+  <span id="state"></span>
+</div>
+
+<nav><a href="#">Home</a><a href="#">Pricing</a><a href="#">Docs</a></nav>
+<h1 id="h1">Understanding Service Workers</h1>
+<p id="p1">A service worker is a script that your browser runs in the background, separate from a web page, opening the door to features that don't need a web page or user interaction.</p>
+<p id="p2">Call <code>navigator.serviceWorker.register()</code> to install it, and read the <a href="#">registration guide</a> for <strong>all the details</strong>.</p>
+<ul>
+  <li id="li1">Outer item with text
+    <ul><li id="li2">Nested item text</li></ul>
+  </li>
+</ul>
+<pre id="pre1">const x = 1; // code should not be translated</pre>
+<p id="zh">这一段已经是中文，不应该被翻译。</p>
+<p id="fail">This paragraph will FAILME on purpose.</p>
+<table><tr><td id="td1">Table cell content here</td><td id="num">12345</td></tr></table>
+<div id="dyn"></div>
+<div style="height:1600px"></div>
+<p id="far">This paragraph is far below and should only translate after scrolling.</p>
+
+<h3>Input tests</h3>
+<input id="in1" type="text" style="width:100%">
+<textarea id="ta1" style="width:100%"></textarea>
+<div id="ce1" contenteditable="true" style="border:1px solid #ccc;min-height:2em"></div>
+
+<script>
+  function addDynamic() {
+    const p = document.createElement('p');
+    p.id = 'dyn1';
+    p.textContent = 'This paragraph was added after translation started.';
+    document.getElementById('dyn').appendChild(p);
+  }
+</script>
+<script src="../common.js"></script>
+<script src="../content.js"></script>
+</body>
+</html>

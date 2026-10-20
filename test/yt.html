@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JJ的沉浸翻译 YouTube test</title>
+<link rel="stylesheet" href="../content.css">
+<style>
+  body { margin: 20px; font: 14px sans-serif; background: #fff; }
+  #movie_player { position: relative; width: 640px; height: 360px; background: #222; }
+  .ytp-caption-window-container { position: absolute; bottom: 30px; width: 100%; text-align: center; color: yellow; }
+</style>
+<script>
+  window.__sent = [];
+  window.__t = 0;
+  window.chrome = {
+    runtime: {
+      sendMessage: async (m) => {
+        window.__sent.push(m);
+        await new Promise((r) => setTimeout(r, 100));
+        return { ok: true, translations: m.texts.map((t) => '【译】' + t) };
+      },
+    },
+    storage: { local: { get: async () => ({}) }, onChanged: { addListener() {} } },
+  };
+</script>
+</head>
+<body>
+<div id="movie_player">
+  <video></video>
+  <div class="ytp-caption-window-container">native captions</div>
+</div>
+<button class="ytp-subtitles-button" aria-pressed="true">CC</button>
+<script src="../common.js"></script>
+<script src="../youtube.js"></script>
+<script>
+  const v = document.querySelector('video');
+  Object.defineProperty(v, 'currentTime', { get: () => window.__t });
+  // Auto-generated (word-level) json3 track.
+  window.asrTrack = {
+    events: [
+      { tStartMs: 0, dDurationMs: 4000, segs: [{ utf8: 'hello' }, { utf8: ' everyone', tOffsetMs: 400 }, { utf8: ' welcome', tOffsetMs: 900 }, { utf8: ' back.', tOffsetMs: 1300 }] },
+      { tStartMs: 1500, aAppend: 1, segs: [{ utf8: '\n' }] },
+      { tStartMs: 2000, dDurationMs: 3000, segs: [{ utf8: 'today' }, { utf8: ' we', tOffsetMs: 300 }, { utf8: ' talk', tOffsetMs: 600 }, { utf8: ' about', tOffsetMs: 900 }, { utf8: ' caching', tOffsetMs: 1200 }] },
+      { tStartMs: 6000, dDurationMs: 2000, segs: [{ utf8: 'after' }, { utf8: ' a', tOffsetMs: 200 }, { utf8: ' long', tOffsetMs: 400 }, { utf8: ' pause', tOffsetMs: 600 }] },
+    ],
+  };
+  window.sendTrack = (data, qs) =>
+    window.postMessage({ __lt_yt: 'track', url: 'https://www.youtube.com/api/timedtext?v=abc&' + qs, text: JSON.stringify(data) }, location.origin);
+</script>
+</body>
+</html>

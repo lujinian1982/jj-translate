@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JJ的沉浸翻译 设置</title>
+<style>
+  :root {
+    --bg: #f5f5f7; --card: #ffffff; --fg: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea;
+    --accent: #4f6bff; --accent-fg: #fff; --field: #fbfbfd; --ok: #15803d; --err: #c62828;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #000; --card: #1c1c1e; --fg: #f2f2f7; --muted: #a1a1a6; --line: #38383a; --field: #2c2c2e; --ok: #4ade80; --err: #f87171; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 14px/1.55 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 18px; }
+  h2 { font-size: 15px; margin: 0 0 12px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: 140px 1fr; gap: 10px 14px; align-items: center; }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  label { color: var(--muted); }
+  input[type=text], input[type=password], input[type=number], select, textarea {
+    width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px;
+    background: var(--field); color: var(--fg); font: inherit;
+  }
+  textarea { min-height: 120px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  .hint { color: var(--muted); font-size: 12px; grid-column: 2; margin-top: -4px; }
+  @media (max-width: 560px) { .hint { grid-column: 1; } }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  button { padding: 7px 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--card);
+           color: var(--fg); font: inherit; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+  button.danger { color: var(--err); }
+  .status { margin-top: 10px; font-size: 13px; white-space: pre-wrap; word-break: break-all; }
+  .ok { color: var(--ok); } .err { color: var(--err); }
+  .check { display: flex; align-items: center; gap: 8px; color: var(--fg); }
+  .save-bar { position: sticky; bottom: 0; padding: 12px 0; background: var(--bg); display: flex; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>JJ的沉浸翻译 · 设置</h1>
+
+  <section>
+    <h2>模型 API</h2>
+    <div class="grid">
+      <label for="profileSel">当前配置</label>
+      <select id="profileSel"></select>
+      <label for="pName">名称</label>
+      <input id="pName" type="text">
+      <label for="pBase">Base URL</label>
+      <input id="pBase" type="text" placeholder="https://api.deepseek.com">
+      <div class="hint">OpenAI 兼容接口。会自动补上 /chat/completions；已以它结尾时原样使用。</div>
+      <label for="pKey">API Key</label>
+      <input id="pKey" type="password" autocomplete="off">
+      <label for="pModel">模型名</label>
+      <input id="pModel" type="text" placeholder="deepseek-chat">
+      <div class="hint">DeepSeek：deepseek-chat。智谱：glm-4-flash（免费）、glm-4-air、glm-4.5-air 等。</div>
+      <label for="pTemp">Temperature</label>
+      <input id="pTemp" type="number" min="0" max="2" step="0.1">
+      <label for="pJson">JSON 模式</label>
+      <label class="check"><input id="pJson" type="checkbox"> 发送 response_format: json_object（批量翻译更稳）</label>
+      <label for="pExtra">额外请求参数</label>
+      <input id="pExtra" type="text" placeholder='{"thinking":{"type":"disabled"}}'>
+      <div class="hint">JSON，合并进请求体。智谱 GLM-4.5 以上的推理模型建议填上面的示例，关闭思考以提速。</div>
+    </div>
+    <div class="bar">
+      <button id="addDeepseek">新增 DeepSeek</button>
+      <button id="addZhipu">新增 智谱</button>
+      <button id="addCustom">新增 自定义</button>
+      <button id="test">测试连接</button>
+      <button id="del" class="danger">删除此配置</button>
+    </div>
+    <div id="testStatus" class="status"></div>
+  </section>
+
+  <section>
+    <h2>翻译</h2>
+    <div class="grid">
+      <label for="targetLang">网页目标语言</label>
+      <select id="targetLang"></select>
+      <label for="inputTargetLang">输入框目标语言</label>
+      <select id="inputTargetLang"></select>
+      <label for="inputTrigger">输入框触发</label>
+      <label class="check"><input id="inputTrigger" type="checkbox"> 在输入框末尾连按 3 次空格自动翻译</label>
+      <label for="batchSize">每次请求段落数</label>
+      <input id="batchSize" type="number" min="1" max="40">
+      <label for="maxChars">每次请求最大字数</label>
+      <input id="maxChars" type="number" min="200" max="20000" step="100">
+      <label for="concurrency">并发请求数</label>
+      <input id="concurrency" type="number" min="1" max="16">
+    </div>
+  </section>
+
+  <section>
+    <h2>YouTube 字幕</h2>
+    <div class="grid">
+      <label for="ytEnabled">启用</label>
+      <label class="check"><input id="ytEnabled" type="checkbox"> 打开字幕（CC）时自动翻译整条字幕</label>
+      <label for="ytOrig">原文</label>
+      <label class="check"><input id="ytOrig" type="checkbox"> 译文下方同时显示原文字幕</label>
+    </div>
+  </section>
+
+  <section>
+    <h2>PDF（BabelDOC）</h2>
+    <div class="grid">
+      <label for="babeldocUrl">BabelDOC 地址</label>
+      <input id="babeldocUrl" type="text" placeholder="http://your-server:8080">
+      <div class="hint">你部署的 BabelDOC 网页地址。留空时，弹窗里的 PDF 按钮会打开本设置页。</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>高级：批量翻译提示词</h2>
+    <textarea id="systemPrompt" spellcheck="false"></textarea>
+    <div class="hint" style="grid-column:auto;margin-top:6px">留空使用默认提示词。{{to}} 会替换为目标语言。必须要求模型返回 {"translations": [...]}，且条数与输入相同。</div>
+  </section>
+
+  <div class="save-bar">
+    <button id="save" class="primary">保存</button>
+    <span id="saveStatus" class="status"></span>
+  </div>
+</div>
+<script src="common.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

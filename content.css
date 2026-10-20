@@ -1,0 +1,163 @@
+/* ---------- translation element ---------- */
+lt-trans {
+  white-space: pre-line;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+lt-trans.lt-block {
+  display: block;
+  margin: 0.3em 0 0.1em;
+}
+lt-trans.lt-inline {
+  display: inline;
+}
+lt-orig {
+  display: contents;
+}
+lt-text {
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---------- themes (set on <html data-lt-theme>) ---------- */
+html[data-lt-theme="dashed"] lt-trans lt-text {
+  border-bottom: 1px dashed rgba(110, 140, 255, 0.9);
+  padding-bottom: 1px;
+}
+html[data-lt-theme="underline"] lt-trans lt-text {
+  text-decoration: underline;
+  text-decoration-color: rgba(110, 140, 255, 0.9);
+  text-underline-offset: 3px;
+}
+html[data-lt-theme="wavy"] lt-trans lt-text {
+  text-decoration: underline wavy;
+  text-decoration-color: rgba(110, 140, 255, 0.9);
+  text-underline-offset: 4px;
+}
+html[data-lt-theme="highlight"] lt-trans lt-text {
+  background: rgba(255, 214, 0, 0.32);
+  border-radius: 2px;
+}
+html[data-lt-theme="blockquote"] lt-trans.lt-block {
+  border-left: 3px solid rgba(110, 140, 255, 0.9);
+  padding-left: 0.6em;
+}
+html[data-lt-theme="faded"] lt-trans lt-text {
+  opacity: 0.62;
+}
+html[data-lt-theme="italic"] lt-trans lt-text {
+  font-style: italic;
+}
+
+/* ---------- translation-only mode ---------- */
+html.lt-only lt-orig {
+  display: none !important;
+}
+html.lt-only lt-trans {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+html.lt-only lt-trans lt-text {
+  border: 0 !important;
+  background: none !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+  font-style: inherit !important;
+}
+
+/* ---------- loading & error ---------- */
+lt-dot {
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: rgba(110, 140, 255, 0.9);
+  vertical-align: middle;
+  animation: lt-pulse 0.9s ease-in-out infinite;
+}
+@keyframes lt-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+lt-trans.lt-error lt-text {
+  color: #d33 !important;
+  font-size: 0.85em;
+  cursor: pointer;
+  border: 0 !important;
+  background: none !important;
+  text-decoration: none !important;
+}
+
+/* ---------- input box ---------- */
+[data-lt-busy] {
+  opacity: 0.55 !important;
+  transition: opacity 0.2s;
+}
+
+/* ---------- toast ---------- */
+lt-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2147483647;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(30, 30, 30, 0.92);
+  color: #fff;
+  font: 13px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  word-break: break-all;
+}
+lt-toast.lt-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- YouTube subtitles ---------- */
+.lt-yt-on .ytp-caption-window-container {
+  display: none !important;
+}
+lt-yt-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: max-content;
+  max-width: 86%;
+  text-align: center;
+  pointer-events: none;
+  display: none;
+  font-family: "YouTube Noto", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  transition: bottom 0.15s;
+}
+.lt-yt-on lt-yt-overlay.lt-has-text {
+  display: block;
+}
+.ytp-autohide lt-yt-overlay {
+  bottom: 4%;
+}
+lt-yt-overlay .lt-yt-line {
+  display: inline;
+  padding: 0.1em 0.35em;
+  line-height: 1.5;
+  background: rgba(8, 8, 8, 0.75);
+  color: #fff;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  white-space: pre-line;
+}
+lt-yt-overlay .lt-yt-orig {
+  font-size: 0.78em;
+  color: #e8e8e8;
+}
+lt-yt-overlay .lt-yt-row + .lt-yt-row {
+  margin-top: 0.15em;
+}
