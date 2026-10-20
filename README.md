@@ -1,57 +1,64 @@
-# JJ的沉浸翻译
+# JJ的沉浸翻译 (JJ Immersive Translate)
 
-一个精简版的沉浸式双语翻译 Chrome 扩展。模型 API 由你自己配置（DeepSeek、智谱 GLM，或任何 OpenAI 兼容接口）。
+English | [简体中文](README.zh-CN.md)
 
-## 功能
+A lightweight Chrome extension for bilingual web page translation. You bring your own model API: DeepSeek, Zhipu GLM, or any OpenAI-compatible endpoint.
 
-| 功能 | 用法 |
+The user interface is in Chinese. This README gives each Chinese label with its English meaning.
+
+## Features
+
+| Feature | How to use |
 | --- | --- |
-| 网页双语对照翻译 | 点弹窗里的“翻译此页”，或按 `Alt+A`。再按一次恢复原文 |
-| 仅显示译文 | 弹窗里选“仅译文” |
-| 译文样式 | 弹窗里选：虚线、下划线、波浪线、高亮、竖线、半透明、斜体 |
-| 输入框翻译 | 在输入框末尾连按 3 次空格，或按 `Alt+I`。目标语言在设置页改 |
-| YouTube 字幕 | 打开视频的 CC 字幕后自动翻译整条字幕，显示“译文 + 原文” |
-| PDF 翻译 | 在设置页填写你部署的 BabelDOC 地址，然后在弹窗里点“PDF 翻译（BabelDOC）” |
+| Bilingual page translation | Click 翻译此页 (Translate this page) in the popup, or press `Alt+A`. Press again to show the original page. |
+| Translation-only mode | In the popup, select 仅译文 (Translation only). |
+| Translation styles | In the popup, select a style: dashed underline, underline, wavy line, highlight, left bar, faded, or italic. |
+| Input box translation | Type three spaces at the end of a text field, or press `Alt+I`. Set the target language in the options page. |
+| YouTube subtitles | Turn on CC in a video. The extension translates the whole subtitle track and shows the translation above the original line. |
+| PDF translation | Enter the address of your own BabelDOC deployment in the options page. Then click PDF 翻译（BabelDOC） in the popup. |
 
-## 安装
+## Installation
 
-1. 打开 `chrome://extensions`。
-2. 打开右上角的“开发者模式”。
-3. 点“加载已解压的扩展程序”，选择本文件夹 `lite-translate`。
-4. 在扩展的设置页填写 API Key，点“测试连接”，再点“保存”。
+1. Get the code: run `git clone https://github.com/lujinian1982/jj-translate.git`, or click Code → Download ZIP on GitHub and unzip it.
+2. Open `chrome://extensions`.
+3. Turn on Developer mode (top right).
+4. Click Load unpacked and select the `jj-translate` folder.
+5. Open the extension's options page. Enter your API key, click 测试连接 (Test connection), and then click 保存 (Save).
 
-## 模型配置
+## Model configuration
 
-| 服务 | Base URL | 模型名 |
+| Provider | Base URL | Model |
 | --- | --- | --- |
 | DeepSeek | `https://api.deepseek.com` | `deepseek-chat` |
-| 智谱 | `https://open.bigmodel.cn/api/paas/v4` | `glm-4-flash`（免费）、`glm-4-air` |
+| Zhipu GLM | `https://open.bigmodel.cn/api/paas/v4` | `glm-4-flash` (free), `glm-4-air` |
 
-智谱 GLM-4.5 以上的模型默认会先“思考”，速度慢。在“额外请求参数”里填 `{"thinking":{"type":"disabled"}}` 可以关闭思考。
+The extension adds `/chat/completions` to the base URL. If the URL already ends with it, the extension uses the URL as is.
 
-## 工作原理
+Zhipu GLM-4.5 and later models "think" before they answer, which makes translation slow. To turn thinking off, put `{"thinking":{"type":"disabled"}}` in the 额外请求参数 (Extra request parameters) field.
 
-1. `content.js` 找出页面里的段落，只处理接近屏幕的段落。
-2. 每 8 段合成一次请求，发给 `background.js`。
-3. `background.js` 用 JSON 格式调用 `/chat/completions`，按顺序拆回译文。条数不符时，改为逐段翻译。
-4. 译文插在原段落后面的 `<lt-trans>` 元素里。
-5. YouTube：`yt_main.js` 在页面里截获播放器下载的字幕（`/api/timedtext`），`youtube.js` 翻译整条字幕，再按播放时间显示。
+## How it works
 
-## 测试
+1. `content.js` finds the paragraphs on the page. It translates only paragraphs near the visible area.
+2. It sends paragraphs to `background.js` in batches of 8.
+3. `background.js` calls `/chat/completions` and asks for a JSON reply. It splits the reply back into paragraphs in order. If the item count does not match, it translates each paragraph separately.
+4. The extension inserts each translation in an `<lt-trans>` element after its source paragraph.
+5. YouTube: `yt_main.js` captures the subtitle track that the player downloads (`/api/timedtext`). `youtube.js` translates the whole track and shows each line at its play time.
+
+## Tests
 
 ```bash
 node test/background.test.js
 ```
 
-`test/harness.html` 和 `test/yt.html` 用模拟的扩展 API 测试网页翻译和字幕逻辑。用任意本地 HTTP 服务器打开它们即可。
+`test/harness.html` and `test/yt.html` test the page and subtitle logic with a mock extension API. Open them from any local HTTP server.
 
-## 已知限制
+## Known limits
 
-- 译文是纯文本，不保留原段落里的链接和加粗。
-- 只处理顶层页面，不处理 iframe。
-- YouTube 只支持 json3 字幕格式（网页版播放器的默认格式）。
-- BabelDOC 只是打开你的站点，PDF 需要在那里上传。
+- Translations are plain text. Links and bold text in the source paragraph are not kept.
+- Only the top-level page is translated, not iframes.
+- YouTube support needs the json3 subtitle format, which is the default format of the web player.
+- The BabelDOC button only opens your BabelDOC site. You upload the PDF there.
 
-## 许可证
+## License
 
-MIT，见 [LICENSE](LICENSE)。
+MIT. See [LICENSE](LICENSE).
